@@ -14,16 +14,16 @@ Requires the use of [sax-js](https://github.com/isaacs/sax-js/).
 ```javascript
   var SAXStreamer = require("sax-streamer");
   
-	var saxStreamer = new SAXStreamer(opts);
+  var saxStreamer = new SAXStreamer(opts);
 	 
-	var xml = ... // get a stream
+  var xml = ... // get a stream
 	
-	/*
-	 * strict and opts are passed to sax-js createStream
-	 */
-	var dest = saxStreamer.createStream(xml, strict, opts);
-	
-	dest.pipe(process.stdout);
+  /*
+   * strict and opts are passed to sax-js createStream
+   */
+  var dest = saxStreamer.createStream(xml, strict, opts);
+
+  dest.pipe(process.stdout);
 ```
 
 ## Constructor Arguments
