@@ -1,6 +1,6 @@
 {
   "name": "sax-streamer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A SAX utility that allows modification of the XML during processing",
   "author": {
     "name": "Kieran Simpson",
