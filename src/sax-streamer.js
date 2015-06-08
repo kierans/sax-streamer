@@ -96,9 +96,10 @@ SAXStreamer.prototype.doctype = function(doctype) {
 SAXStreamer.prototype.opentag = function (tag) {
   this.print("<" + tag.name);
 
-  for (var i in tag.attributes) {
-    if (tag.attributes.hasOwnProperty(i)) {
-      this.print(" " + i + "=\""+ this.encodeEntities(tag.attributes[i]) + "\"");
+  var attributes = tag.attributes;
+  for (var i in  attributes) {
+    if (attributes.hasOwnProperty(i)) {
+      this.print(" " + i + "=\""+ this.encodeEntities(attributes[i]) + "\"");
     }
   }
 
