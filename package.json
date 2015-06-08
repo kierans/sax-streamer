@@ -16,7 +16,7 @@
     "type": "hg",
     "url": "https://bitbucket.org/kierans777/sax-streamer"
   },
-  "main": "src/lib.js",
+  "main": "src/sax-streamer.js",
   "scripts": {
     "test": "grunt test"
   },

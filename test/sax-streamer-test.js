@@ -15,7 +15,7 @@ var clone = require("clone"),
     nimble = require("nimble"),
     sax = require("sax");
 
-var SAXStreamer = require("../src/lib");
+var SAXStreamer = require("../src/sax-streamer");
 
 describe("SAX Streamer tests", function() {
   var opts, expectedFile;
