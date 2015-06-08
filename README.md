@@ -58,6 +58,10 @@ Subclass `SAXStreamer` overriding the default event handlers as necessary.
 * SAXStreamer.comment
 * SAXStreamer.error
 
+## Creating XML
+
+To aid in creating new XML in the output stream, `SAXFactory` is available.  The resulting nodes mimic the `sax-js` structure.  Thus the results from the factory can be passed to the `SAXStreamer` Event handlers to have resulting XML that textually matches the input XML formatting.
+
 ## Tests
 
 Run `grunt test`
