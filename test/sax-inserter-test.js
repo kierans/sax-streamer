@@ -44,6 +44,17 @@ describe("SAX Inserter test", function() {
     SAXFactory.createText(node, TITLE);
   });
 
+  should("not insert node due to target path not being matched", function(done) {
+    saxInserter.insertBefore("/book/chapter[1]/title", node);
+    saxInserter.insertAfter("/book/chapter[1]/title", node);
+
+    saxInserter.createStream(src, true).pipe(collect(function(xml) {
+      expect(xml).to.equal(XML);
+
+      done();
+    }));
+  });
+
   should("insert node before target node", function(done) {
     saxInserter.insertBefore("/book/chapter[1]/number", node);
 
