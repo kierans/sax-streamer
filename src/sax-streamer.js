@@ -18,6 +18,11 @@ function SAXStreamer(opts) {
 
   var formatting = this.opts.formatting;
   formatting.spaceBeforeSelfClosingTag = formatting.spaceBeforeSelfClosingTag !== undefined ? formatting.spaceBeforeSelfClosingTag : true;
+
+  this.tags = [];
+
+  // maps entity value to entity key eg: " => &quot;
+  this.ents = {};
 }
 
 module.exports = SAXStreamer;
@@ -44,6 +49,9 @@ SAXStreamer.prototype.createStream = function(src, strict, options) {
   });
 
   var saxStream = sax.createStream(strict, options);
+
+  saxStream._streamer = this;
+
   saxStream.print = function() {
     var args = Array.prototype.slice.apply(arguments);
 
@@ -53,11 +61,6 @@ SAXStreamer.prototype.createStream = function(src, strict, options) {
   };
 
   saxStream.encodeEntities = encodeEntities.bind(saxStream);
-
-  saxStream.tags = [];
-  saxStream.opts = this.opts;
-  // maps entity value to entity key eg: " => &quot;
-  saxStream.ents = {};
 
   saxStream.on("text", this.text);
   saxStream.on("doctype", this.doctype);
@@ -104,7 +107,7 @@ SAXStreamer.prototype.opentag = function (tag) {
   }
 
   if (tag.isSelfClosing) {
-    if (this.opts.formatting.spaceBeforeSelfClosingTag) {
+    if (this._streamer.opts.formatting.spaceBeforeSelfClosingTag) {
       this.print(" ");
     }
 
@@ -113,15 +116,17 @@ SAXStreamer.prototype.opentag = function (tag) {
 
   this.print(">");
 
-  this.tags.push(tag);
+  this._streamer.tags.push(tag);
 };
 
 SAXStreamer.prototype.closetag = function (name) {
-  if (!this.tags.top().isSelfClosing) {
+  var tags = this._streamer.tags;
+
+  if (!tags.top().isSelfClosing) {
     this.print("</" + name + ">");
   }
 
-  this.tags.pop();
+  tags.pop();
 };
 
 SAXStreamer.prototype.processinginstruction = function(instruction) {
@@ -166,12 +171,12 @@ function setEntities(saxStreamer, saxStream) {
   }
 
   Object.keys(saxStream._parser.ENTITIES).forEach(function(entity) {
-    saxStream.ents[saxStream._parser.ENTITIES[entity]] = entity;
+    saxStream._streamer.ents[saxStream._parser.ENTITIES[entity]] = entity;
   });
 }
 
 function encodeEntities(str) {
-  var ents = this.ents; // jshint ignore:line
+  var ents = this._streamer.ents; // jshint ignore:line
 
   Object.keys(ents).forEach(function(entity) {
     str = str.replace(new RegExp(entity, "g"), "&" + ents[entity] + ";");
