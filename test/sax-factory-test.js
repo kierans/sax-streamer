@@ -56,6 +56,14 @@ describe("SAX Factory Tests", function() {
     expect(tag.isSelfClosing, "Tag is self closing").to.be.false;
   });
 
+  should("add element to parent element", function() {
+    var parent = SAXFactory.createElement("tag"),
+        child = SAXFactory.createElement(parent, "tag");
+
+    expect(parent.children.length, "child element not added to parent").to.equal(1);
+    expect(parent.children[0], "Child element reference not correct").to.equal(child);
+  });
+
   should("override self closing config given element has children", function() {
     var tag = SAXFactory.createElement("tag");
 
@@ -92,6 +100,14 @@ describe("SAX Factory Tests", function() {
     expect(node.text, "Text not set").to.equal(text);
   });
 
+  should("add text node to parent element", function() {
+    var parent = SAXFactory.createElement("tag"),
+        child = SAXFactory.createText(parent, "text");
+
+    expect(parent.children.length, "child text not added to parent").to.equal(1);
+    expect(parent.children[0], "Child text reference not correct").to.equal(child);
+  });
+
   should("create processing instruction node", function() {
     var name = "xml",
         version = "1.0",
@@ -121,6 +137,14 @@ describe("SAX Factory Tests", function() {
     expect(node.cdata, "CDATA not set").to.equal(cdata);
   });
 
+  should("add cdata to parent element", function() {
+    var parent = SAXFactory.createElement("tag"),
+        child = SAXFactory.createCDATA(parent, "data");
+
+    expect(parent.children.length, "child cdata not added to parent").to.equal(1);
+    expect(parent.children[0], "Child cdata reference not correct").to.equal(child);
+  });
+
   should("create comment node", function() {
     var comment = "This is a comment";
 
@@ -128,5 +152,13 @@ describe("SAX Factory Tests", function() {
 
     expect(node.nodeType, "Incorrect node type").to.equal(SAXFactory.NodeTypes.COMMENT);
     expect(node.comment, "Comment not set").to.equal(comment);
+  });
+
+  should("add comment to parent element", function() {
+    var parent = SAXFactory.createElement("tag"),
+        child = SAXFactory.createComment(parent, "comment");
+
+    expect(parent.children.length, "child comment not added to parent").to.equal(1);
+    expect(parent.children[0], "Child comment reference not correct").to.equal(child);
   });
 });

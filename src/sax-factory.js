@@ -48,7 +48,7 @@ exports.createElement = function(parent, tag) {
     var superMethod = node.addChild;
 
     return function(child) {
-      superMethod.apply(node, child);
+      superMethod.call(node, child);
 
       node.isSelfClosing = false;
     };
@@ -57,11 +57,11 @@ exports.createElement = function(parent, tag) {
   return node;
 };
 
-exports.createText = function(text) {
-  return {
-    nodeType: exports.NodeTypes.TEXT,
-    text: text
-  };
+exports.createText = function(parent, text) {
+  var node = createLeafNode(parent, text, "text");
+  node.nodeType =  exports.NodeTypes.TEXT;
+
+  return node;
 };
 
 exports.createProcessingInstruction = function(instruction) {
@@ -83,18 +83,18 @@ exports.createProcessingInstruction = function(instruction) {
   };
 };
 
-exports.createCDATA = function(cdata) {
-  return {
-    nodeType: exports.NodeTypes.CDATA,
-    cdata: cdata
-  };
+exports.createCDATA = function(parent, cdata) {
+  var node = createLeafNode(parent, cdata, "cdata");
+  node.nodeType =  exports.NodeTypes.CDATA;
+
+  return node;
 };
 
-exports.createComment = function(comment) {
-  return {
-    nodeType: exports.NodeTypes.COMMENT,
-    comment: comment
-  };
+exports.createComment = function(parent, comment) {
+  var node = createLeafNode(parent, comment, "comment");
+  node.nodeType =  exports.NodeTypes.COMMENT;
+
+  return node;
 };
 
 function Node() {
@@ -105,3 +105,17 @@ function Node() {
 Node.prototype.addChild = function(child) {
   this.children.push(child);
 };
+
+function createLeafNode(parent, prop, propName) {
+  if (!prop) {
+    prop = parent;
+    parent = undefined;
+  }
+
+  var node = exports.createNode(parent);
+  delete node.children;
+
+  node[propName] = prop;
+
+  return node;
+}
