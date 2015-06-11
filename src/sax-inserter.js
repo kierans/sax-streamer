@@ -2,6 +2,8 @@
 
 var utils = require("util");
 
+var merge = require("merge");
+
 var SAXStreamer = require("./sax-streamer"),
     SAXFactory = require("./sax-factory");
 
@@ -18,6 +20,7 @@ function SAXInserter() {
 
   this.beforeTargets = [];
   this.afterTargets = [];
+  this.attributeTargets = [];
   this.seenTags = {};
 }
 
@@ -32,15 +35,21 @@ SAXInserter.prototype.insertAfter = function(target, node) {
   insert(this.afterTargets, target, node);
 };
 
+SAXInserter.prototype.insertAttributes = function(target, attributes) {
+  insert(this.attributeTargets, target, attributes);
+};
+
 SAXInserter.prototype.opentag = function(tag) {
   var self = this,
       streamer = this._streamer,
       path = toPath.call(streamer, streamer.tags, tag);
 
-  streamer.beforeTargets.forEach(function(target) {
-    if (hitTarget(target.target, path)) {
-      writeNode.call(self, target.node);
-    }
+  checkTargets(streamer.attributeTargets, path, function(target) {
+    tag.attributes = merge(tag.attributes, target.data);
+  });
+
+  checkTargets(streamer.beforeTargets, path, function(target) {
+    writeNode.call(self, target.data);
   });
 
   SAXStreamer.prototype.opentag.apply(this, slice.call(arguments));
@@ -53,13 +62,11 @@ SAXInserter.prototype.closetag = function() {
       path = toPath.call(streamer, streamer.tags),
       hit = false;
 
-  streamer.afterTargets.forEach(function(target) {
-    if (hitTarget(target.target, path)) {
-      SAXStreamer.prototype.closetag.apply(self, args);
-      writeNode.call(self, target.node);
+  checkTargets(streamer.afterTargets, path, function(target) {
+    SAXStreamer.prototype.closetag.apply(self, args);
+    writeNode.call(self, target.data);
 
-      hit = true;
-    }
+    hit = true;
   });
 
   if (!hit) {
@@ -142,6 +149,14 @@ function toPath(tags, tag) {
   return path;
 }
 
+function checkTargets(targets, path, cb) {
+  targets.forEach(function(target) {
+    if (hitTarget(target.target, path)) {
+      cb(target);
+    }
+  });
+}
+
 function hitTarget(target, path) {
   path = parsePath(path);
 
@@ -191,6 +206,6 @@ function insert(targets, target, node) {
 
   targets.push({
     target: target,
-    node: node
+    data: node
   });
 }

@@ -120,4 +120,41 @@ describe("SAX Inserter test", function() {
       done();
     }));
   });
+
+  should("insert attribute into target node", function(done) {
+    saxInserter.insertAttributes("/book/chapter[1]", {
+      title: TITLE
+    });
+
+    saxInserter.createStream(src, true).pipe(collect(function(xml) {
+      var doc = new DOMParser().parseFromString(xml);
+
+      var results = select(doc, "/book/chapter[1]/@title");
+      expect(results.length, "Didn't insert title attribute correctly").to.equal(1);
+      expect(results[0].value, "Didn't insert correct title").to.equal(TITLE);
+
+      expect(select(doc, "/book/chapter[2]/@title").length, "Inserted title attribute incorrectly").to.equal(0);
+      expect(select(doc, "/book/chapter[3]/@title").length, "Inserted title attribute incorrectly").to.equal(0);
+
+      done();
+    }));
+  });
+
+  should("insert attribute into every target node", function(done) {
+    saxInserter.insertAttributes("/book/chapter", {
+      title: TITLE
+    });
+
+    saxInserter.createStream(src, true).pipe(collect(function(xml) {
+      var doc = new DOMParser().parseFromString(xml);
+
+      for (var i = 1; i <= NUM_CHAPTERS; i++) {
+        var results = select(doc, "/book/chapter[" + i + "]/@title");
+        expect(results.length, "Didn't insert title attribute correctly").to.equal(1);
+        expect(results[0].value, "Didn't insert correct title").to.equal(TITLE);
+      }
+
+      done();
+    }));
+  });
 });
