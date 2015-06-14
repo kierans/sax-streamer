@@ -41,11 +41,17 @@ SAXStreamer.prototype.createStream = function(src, strict, options) {
   options = options || {};
   options.strictEntities = options.strictEntities || true;
 
+  function srcInFlowingMode() {
+    return src._readableState.flowing;
+  }
+
   var dest = new PassThrough();
   dest.setEncoding("utf8");
 
   dest.on("drain", function () {
-    src.resume();
+    if (!srcInFlowingMode()) {
+      src.resume();
+    }
   });
 
   var saxStream = sax.createStream(strict, options);
@@ -56,7 +62,11 @@ SAXStreamer.prototype.createStream = function(src, strict, options) {
     var args = Array.prototype.slice.apply(arguments);
 
     if (!dest.write.apply(dest, args)) {
-      src.pause();
+      if (!srcInFlowingMode()) {
+        // can't pause a flowing stream
+        // see http://stackoverflow.com/questions/30816096/how-to-pause-nodejs-flowing-stream-when-destination-is-full
+        src.pause();
+      }
     }
   };
 
