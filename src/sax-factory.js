@@ -36,7 +36,7 @@ exports.createElement = function(parent, tag) {
   };
 
   if (!tag || !tag.name) {
-    throw new Error("Can't create an element with a name");
+    throw new Error("Can't create an element without a name");
   }
 
   var node = exports.createNode(parent);
