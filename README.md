@@ -1,5 +1,5 @@
 ## sax-streamer
-A SAX utility that allows modification of the XML text during processing
+A SAX utility that wraps `sax-js` to allow modification of the XML text during processing.
 
 ## Install
 
@@ -56,7 +56,7 @@ var XML =
 var title = SAXFactory.createElement("title");
 SAXFactory.createText(title, TITLE);
 
-saxInserter = new SAXInserter();
+var saxInserter = new SAXInserter();
 saxInserter.insertBefore("/book/chapter[1]/number", title);
 
 saxInserter.createStream(createStreamFromXML(XML), true).pipe(process.stdout);
