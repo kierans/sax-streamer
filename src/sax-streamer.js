@@ -56,6 +56,9 @@ SAXStreamer.prototype.createStream = function(src, strict, options) {
 
   var saxStream = sax.createStream(strict, options);
 
+  /*
+   * sax-js handlers are called with the saxSteam being `this`.  Therefore we want to maintain a reference to us.
+   */
   saxStream._streamer = this;
 
   saxStream.print = function() {

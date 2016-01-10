@@ -11,12 +11,15 @@ Requires the use of [sax-js](https://github.com/isaacs/sax-js/).
 
 ## Usage
 
+The following example shows the use of the base class which (mostly) recreates the XML document textually from a stream
+containing XML document text.
+
 ```javascript
-  var SAXStreamer = require("sax-streamer");
+  var SAXStreamer = require("sax-streamer").SAXStreamer;
   
   var saxStreamer = new SAXStreamer(opts);
 	 
-  var xml = ... // get a stream
+  var xml = // ... get a stream
 	
   /*
    * strict and opts are passed to sax-js createStream
@@ -24,6 +27,55 @@ Requires the use of [sax-js](https://github.com/isaacs/sax-js/).
   var dest = saxStreamer.createStream(xml, strict, opts);
 
   dest.pipe(process.stdout);
+```
+
+However that isn't every useful. `SAXStreamer` servers as a base class for other classes that may want to manipulate the 
+XML document as it's being parsed.
+
+`SAXInserter` allows element attributes to be modified as well as inserting nodes into the document (before or after a
+given path).
+
+```javascript
+var SAXInserter = require("sax-streamer").SAXInserter,
+    SAXFactory = require("sax-streamer").SAXFactory;
+    
+var XML =
+    "<?xml version=\"1.0\" charset=\"UTF-8\" ?>" +
+    "<book>" +
+    "  <chapter>" +
+    "    <number>1</number>" +
+    "  </chapter>" +
+    "  <chapter>" +
+    "    <number>2</number>" +
+    "  </chapter>" +
+    "  <chapter>" +
+    "    <number>3</number>" +
+    "  </chapter>" +
+    "</book>";
+    
+var title = SAXFactory.createElement("title");
+SAXFactory.createText(title, TITLE);
+
+saxInserter = new SAXInserter();
+saxInserter.insertBefore("/book/chapter[1]/number", title);
+
+saxInserter.createStream(createStreamFromXML(XML), true).pipe(process.stdout);
+```
+
+```
+<?xml version="1.0" charset="UTF-8" ?>
+<book>
+  <chapter>
+    <title>Greatest Story Ever Told</title>
+    <number>1</number>
+  </chapter>
+  <chapter>
+    <number>2</number>
+  </chapter>
+  <chapter>
+    <number>3</number>
+  </chapter>
+</book>
 ```
 
 ## Constructor Arguments

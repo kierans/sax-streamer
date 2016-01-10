@@ -44,6 +44,11 @@ exports.createElement = function(parent, tag) {
   node.name = tag.name;
   node.isSelfClosing = tag.selfClosing;
   node.attributes = tag.attributes || {};
+
+  /*
+   * Override the addChild method so that if children are added, the isSelfClosing property is set correctly (can't
+   * be self closing if the element has child nodes)
+   */
   node.addChild = (function() {
     var superMethod = node.addChild;
 
